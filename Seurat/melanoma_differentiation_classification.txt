@@ -1,0 +1,20 @@
+
+Excerpt taken from "Single-cell RNA sequencing reveals melanoma cell statedependent
+heterogeneity of response to MAPK inhibitors" 
+Lim et al. 2024
+--> Methodology is explained very well in the supplementary
+
+Analysis of hallmark signatures in melanoma cell cultures Transcriptome data of previously RNA-sequenced melanoma
+cell lines were retrieved from the Sequence Read Archive under accession code PRJNA818797. FPKM values were used for ssGSEA14 to derive the absolute
+enrichment scores using the gene sets from the Molecular Signature Database version 6.215 and to determine
+the melanoma differentiation transcriptome subtypes (undifferentiated, neural crest-like, transitory
+and melanocytic) using the support vector machine “top-scoring pairs” scripts kindly provided by Dr T.
+Graeber.6 These transcriptome subtypes correspond to the differentiated (melanocytic and transitory) and dedifferentiated
+melanoma phenotypes (neural crest-like and undifferentiated).6,16
+
+The vector machine scoring algorithm is taken from "Multi-stage Differentiation Defines Melanoma Subtypes with Differential Vulnerability to Drug-Induced Iron-Dependent Oxidative Stress" 
+Tsoi et al. 2018
+
+Classify cell types with "scClassify" (bioConductor), analyze CNV with Numbat (https://github.com/kharchenkolab/numbat?tab=readme-ov-file)
+
+Remember to remove biases like cell cycle bias (and others?)
