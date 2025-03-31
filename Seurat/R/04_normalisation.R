@@ -1,5 +1,5 @@
 #*****************************************
-# 1. Follow tutorial here: https://github.com/hbctraining/
+# 1. Follow tutorial here: https://github.com/hbctraining/ & https://www.youtube.com/watch?v=uvyG9yLuNSE
 
 ## clear workspace and memory
 rm(list = ls())
@@ -21,10 +21,6 @@ library(Seurat)
 
 ## load seurat object
 filtered_seurat <- readRDS("~/scRNAseq/GSE171524/rds/03_GSE171524_seurat_filtered.rds")
-
-## compare to python
-## default normalization with log transformation
-## integration with scVI 
 
 ## split object for separate normalization
 filtered_seurat[["RNA"]] <- split(filtered_seurat[["RNA"]], f = filtered_seurat$orig.ident)
@@ -49,11 +45,8 @@ top10 <- head(VariableFeatures(filtered_seurat, layer = "scale.data"), 10)
 # # plot variable features with and without labels
 p1 <- VariableFeaturePlot(filtered_seurat)
 p2 <- LabelPoints(plot = p1, points = top10, repel = TRUE)
-
-# ## plot results
-png("Seurat/results/variable_features.png", width = 210, height =297, unit = "mm", res = 300)
-ggpubr::ggarrange(p1,p2, nrow = 2)
-dev.off()
+p3 <- ggpubr::ggarrange(p1,p2, nrow = 2)
+ggsave("Seurat/results/variable_features.png", p3, width = 210, height =297, unit = "mm")
 
 ## save data
 saveRDS(filtered_seurat, file = "~/scRNAseq/GSE171524/rds/04_GSE171524_seurat_scaled.rds")

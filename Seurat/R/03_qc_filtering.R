@@ -1,5 +1,5 @@
 #*****************************************
-# 1. Follow tutorial here: https://github.com/hbctraining/
+# 1. Follow tutorial here: https://github.com/hbctraining/ & https://www.youtube.com/watch?v=uvyG9yLuNSE
 
 ## clear workspace and memory
 rm(list = ls())
@@ -12,7 +12,6 @@ gc()
 library(tidyverse)
 library(SingleCellExperiment)
 library(Seurat)
-library(scater)
 library(scales)
 library(cowplot)
 library(RCurl)
@@ -87,20 +86,15 @@ p1 <- metadata %>%
 p2 <- custom_RidgePlot(seurat.obj = merged_seurat, metric = "nUMI", upper.xlim = 10000)
 p3 <- custom_RidgePlot(seurat.obj = merged_seurat,metric = "nGene", upper.xlim = 5000)
 p4 <- custom_RidgePlot(seurat.obj = merged_seurat,metric = "log10GenesPerUMI")
-p5 <- custom_RidgePlot(seurat.obj = merged_seurat,metric = "mitoRatio")
+p5 <- custom_RidgePlot(seurat.obj = merged_seurat,metric = "MitoRatio")
 
 ## arrange plots
 p6 <- ggarrange(p2,p3,p4, p5, ncol = 2, nrow = 2, labels = LETTERS[2:5])
 p7 <- ggarrange(p1, p6, ncol = 1, nrow = 2, labels = c(LETTERS[1], ""), heights = c(0.37, 0.63))
 
-## plot results
-png("Seurat/results/QC_RidgePlot.png", width = 240, height =350, unit = "mm", res = 300)
-p7
-dev.off()
-
 # Visualize the correlation between genes detected and number of UMIs and determine whether strong presence of cells with low numbers of genes/UMIs
 p8 <- ggplot(metadata) +
-  geom_point(aes(x=nUMI,y=nGene,fill=mitoRatio > 0.05),shape=21,alpha=0.4) + 
+  geom_point(aes(x=nUMI,y=nGene,fill=MitoRatio > 0.05),shape=21,alpha=0.4) + 
   theme_prism() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -111,20 +105,17 @@ p8 <- ggplot(metadata) +
   geom_vline(xintercept = 500,color="red",linetype="dotted")+
   geom_hline(yintercept=250,color="red", linetype="dotted")
 
-png("Seurat/results/combined_qc_scatter.png", width = 300, height =250, unit = "mm", res = 300)
-p8
-dev.off()
-
 ## violin plot of different metrics 
 p9a <- VlnPlot_scCustom(merged_seurat, features = "nUMI", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
 p9b <- VlnPlot_scCustom(merged_seurat, features = "nGene", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
 p9c <- VlnPlot_scCustom(merged_seurat, features = "log10GenesPerUMI", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
-p9d <- VlnPlot_scCustom(merged_seurat, features = "mitoRatio", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
+p9d <- VlnPlot_scCustom(merged_seurat, features = "MitoRatio", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
 p9  <- ggarrange(p9a, p9b, p9c, p9d, ncol = 2, nrow = 2, labels = LETTERS[1:4])
 
-png("Seurat/results/QC_ViolinPlot.png", width = 300, height =250, unit = "mm", res = 300)
-p9
-dev.off()
+## save plots
+ggsave("Seurat/results/QC_RidgePlot.png", p7, width = 240, height =350, unit = "mm")
+ggsave("Seurat/results/combined_qc_scatter.png", p8, width = 300, height =250, unit = "mm")
+ggsave("Seurat/results/QC_ViolinPlot.png", p9, width = 300, height =250, unit = "mm")
 
 #*****************************************
 #* 6 Application of filters and reexamination of quality criteria
@@ -134,14 +125,14 @@ dev.off()
 nUMI_keep  <- !isOutlier(metadata$nUMI, nmads=5, log=TRUE) 
 nGene_keep <- !isOutlier(metadata$nGene, nmads=5, log=TRUE)
 log10GenesPerUMI_keep <- !isOutlier(metadata$log10GenesPerUMI, nmads=5) 
-mito_keep  <- metadata$mitoRatio < 0.1
+mito_keep  <- metadata$MitoRatio < 0.1
 # mito.keep  <- !(isOutlier(metadata$mitoRatio, nmads=3, type="higher")) 
 
 ## calculate thresholds for plotting 
 nUMI_thresholds <- calc_thresholds(metadata, "nUMI", nmad = 5, log.transform = TRUE) ## good default would be higher than 500 
 nGene_thresholds <- calc_thresholds(metadata, "nGene", nmad = 5, log.transform = TRUE)  ## good default is higher than 200-250
 log10GenesPerUMI_thresholds <- calc_thresholds(metadata, "log10GenesPerUMI", nmad = 5, log.transform = FALSE) ## good default is higher than 0.8
-mitoRatio_thresholds <- calc_thresholds(metadata, "mitoRatio", nmad = 3, log.transform = FALSE) ## good default is lower than 20% or 10%
+MitoRatio_thresholds <- calc_thresholds(metadata, "MitoRatio", nmad = 3, log.transform = FALSE) ## good default is lower than 20% or 10%
 
 ## apply all fitlers simultaneously
 qc_pass <- nUMI_keep & nGene_keep & log10GenesPerUMI_keep & mito_keep
@@ -168,6 +159,9 @@ filtered_seurat <- CreateSeuratObject(filtered_counts, meta.data = filtered_seur
 ## extract filtered metadata
 metadata_filtered <- filtered_seurat@meta.data
 
+#*****************************************
+# 7. Visualization after filtering
+
 ## Visualize the number of cell counts per sample
 p1 <- metadata_filtered %>%
   ggplot(aes(x = orig.ident, fill = orig.ident)) + 
@@ -183,20 +177,15 @@ p1 <- metadata_filtered %>%
 p2 <- custom_RidgePlot(seurat.obj = filtered_seurat, metric = "nUMI", upper.xlim = 10000)
 p3 <- custom_RidgePlot(seurat.obj = filtered_seurat,metric = "nGene", upper.xlim = 5000)
 p4 <- custom_RidgePlot(seurat.obj = filtered_seurat,metric = "log10GenesPerUMI")
-p5 <- custom_RidgePlot(seurat.obj = filtered_seurat,metric = "mitoRatio")
+p5 <- custom_RidgePlot(seurat.obj = filtered_seurat,metric = "MitoRatio")
 
 ## arrange plots
 p6 <- ggarrange(p2,p3,p4, p5, ncol = 2, nrow = 2, labels = LETTERS[2:5])
 p7 <- ggarrange(p1, p6, ncol = 1, nrow = 2, labels = c(LETTERS[1], ""), heights = c(0.37, 0.63))
 
-## plot results
-png("Seurat/results/QC_RidgePlot_filtered.png", width = 240, height =350, unit = "mm", res = 300)
-p7
-dev.off()
-
 # Visualize the correlation between genes detected and number of UMIs and determine whether strong presence of cells with low numbers of genes/UMIs
 p8 <- ggplot(metadata_filtered) +
-  geom_point(aes(x=nUMI,y=nGene,fill=mitoRatio > 0.05),shape=21,alpha=0.4) + 
+  geom_point(aes(x=nUMI,y=nGene,fill=MitoRatio > 0.05),shape=21,alpha=0.4) + 
   theme_prism() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -207,28 +196,17 @@ p8 <- ggplot(metadata_filtered) +
   geom_vline(xintercept = 500,color="red",linetype="dotted")+
   geom_hline(yintercept=250,color="red", linetype="dotted")
 
-png("Seurat/results/combined_qc_scatter_filtered.png", width = 300, height =250, unit = "mm", res = 300)
-p8
-dev.off()
-
 ## violin plot of different metrics 
 p9a <- VlnPlot_scCustom(filtered_seurat, features = "nUMI", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
 p9b <- VlnPlot_scCustom(filtered_seurat, features = "nGene", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
 p9c <- VlnPlot_scCustom(filtered_seurat, features = "log10GenesPerUMI", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
-p9d <- VlnPlot_scCustom(filtered_seurat, features = "mitoRatio", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
+p9d <- VlnPlot_scCustom(filtered_seurat, features = "MitoRatio", alpha = 0.4, raster = F, plot_boxplot = TRUE) & NoLegend()
 p9  <- ggarrange(p9a, p9b, p9c, p9d, ncol = 2, nrow = 2, labels = LETTERS[1:4])
 
-png("Seurat/results/QC_ViolinPlot_filtered.png", width = 300, height =250, unit = "mm", res = 300)
-p9
-dev.off()
-
-## QC with scater
-
-## convert seurat to sce object
-sce <- as.SingleCellExperiment(filtered_seurat)
-
-## plot highest expressed genes
-plotHighestExprs(sce, exprs_values = "counts")
+## save plots
+ggsave("Seurat/results/QC_RidgePlot_filtered.png", p7, width = 240, height =350, unit = "mm")
+ggsave("Seurat/results/combined_qc_scatter_filtered.png", p8, width = 300, height =250, unit = "mm")
+ggsave("Seurat/results/QC_ViolinPlot_filtered.png", p9, width = 300, height =250, unit = "mm")
 
 ## Create .rds object to load at any time
 saveRDS(filtered_seurat, file = "~/scRNAseq/GSE171524/rds/03_GSE171524_seurat_filtered.rds")
