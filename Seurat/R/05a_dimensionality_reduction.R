@@ -23,7 +23,7 @@ library(ggpubr)
 # 4. Load data
 
 ## load seurat object
-scaled_seurat <- readRDS("~/scRNAseq/GSE171524/rds/04_GSE171524_seurat_scaled.rds")
+scaled_seurat <- readRDS("../../scRNAseq_data/GSE171524/rds/04_GSE171524_seurat_scaled.rds")
 colors <- DiscretePalette_scCustomize(num_colors = 36, palette = "polychrome")
 
 #*****************************************
@@ -40,11 +40,11 @@ scaled_seurat <- RunUMAP(scaled_seurat, dims = 1:30, reduction = "pca", reductio
 
 ## visualize possible confounders
 ## Best practice: Run UMAP before integration and plot possible confounders. Re asses after integration
-DimPlot(scaled_seurat, reduction = "umap.unintegrated", group.by = c("Sample", "unintegrated_clusters", "Condition", "Phase"),
-              cols = colors, raster = FALSE, ncol = 1)
+DimPlot_scCustom(scaled_seurat, reduction = "umap.unintegrated", group.by = c("Sample", "unintegrated_clusters", "Condition", "Phase"),
+                 raster = FALSE, num_columns =  = 1)
 
-FeaturePlot(scaled_seurat, c("MitoRatio", "DoubletScore"), raster = FALSE, combine = TRUE, ncol = 1) & 
+FeaturePlot_scCustom(scaled_seurat, c("MitoRatio", "DoubletScore"), raster = FALSE, combine = TRUE, num_columns = 1) & 
   scale_color_viridis_c(option = "inferno", direction = 1)
 
 ## save data
-saveRDS(scaled_seurat, file = "~/scRNAseq/GSE171524/rds/05a_GSE171524_seurat_reduced.rds")
+saveRDS(scaled_seurat, file = "../../scRNAseq_data/GSE171524/rds/05a_GSE171524_seurat_reduced.rds")

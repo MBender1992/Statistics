@@ -20,7 +20,7 @@ library(Seurat)
 # 4. Load data
 
 ## load seurat object
-filtered_seurat <- readRDS("~/scRNAseq/GSE171524/rds/03_GSE171524_seurat_filtered.rds")
+filtered_seurat <- readRDS("../../scRNAseq_data/GSE171524/rds/03_GSE171524_seurat_filtered.rds")
 
 ## split object for separate normalization
 filtered_seurat[["RNA"]] <- split(filtered_seurat[["RNA"]], f = filtered_seurat$orig.ident)
@@ -49,7 +49,7 @@ p3 <- ggpubr::ggarrange(p1,p2, nrow = 2)
 ggsave("Seurat/results/variable_features.png", p3, width = 210, height =297, unit = "mm")
 
 ## save data
-saveRDS(filtered_seurat, file = "~/scRNAseq/GSE171524/rds/04_GSE171524_seurat_scaled.rds")
+saveRDS(filtered_seurat, file = "../../scRNAseq_data/GSE171524/rds/04_GSE171524_seurat_scaled.rds")
 
 
 ## compare with a scTransformed model (in a second step)

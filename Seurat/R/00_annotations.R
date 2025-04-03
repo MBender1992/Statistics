@@ -48,4 +48,3 @@ annotations <- genes(edb, return.type = "data.frame")
 saveRDS(annotations, file = "Seurat/data/gene_annotations.rds")
 
 
-

@@ -39,7 +39,7 @@ theme_prism2 <- function(base_size = 9, base_family = "", ...){
 
 #*****************************************
 # 4. Load data
-list_seurat <- readRDS("~/scRNAseq/GSE171524/rds/01_GSE171524_seurat_list.rds") 
+list_seurat <- readRDS("../../scRNAseq_data/GSE171524/rds/01_GSE171524_seurat_list.rds") 
 ## this object was generated with "make_seurat_object" stored on the workstation with locally
 ## stored large files which would not fit into the github folder (in the ~/scRNAseq folder)
 
@@ -104,8 +104,8 @@ merged_seurat <- FindClusters(merged_seurat, resolution = 0.8)
 merged_seurat <- RunUMAP(merged_seurat, dims = 1:30)
 
 ## plot UMAP
-p2 <- DimPlot(merged_seurat, reduction = "umap") + ggtitle("Default UMAP plot") + xlab("UMAP1") + ylab("UMAP2")
-p3 <- FeaturePlot(merged_seurat, "scDblFinder.score", raster = FALSE) + scale_color_viridis_c(begin = 0, end = 1, option = "inferno") + ggtitle("UMAP colored by doublet score") + xlab("UMAP1") + ylab("UMAP2")
+p2 <- DimPlot_scCustom(merged_seurat, reduction = "umap") + ggtitle("Default UMAP plot") 
+p3 <- FeaturePlot_scCustom(merged_seurat, "scDblFinder.score", raster = FALSE) + ggtitle("UMAP colored by doublet score") 
 p4 <- ggpubr::ggarrange(p1, p2, p3, nrow = 1)
 ggsave("Seurat/results/doublet_detection.png", p4, width = 300, height =100, unit = "mm")
 

@@ -22,7 +22,7 @@ library(ensembldb)
 
 #*****************************************
 # 4. Load data
-list_seurat <- readRDS("~/scRNAseq/GSE171524/rds/01_GSE171524_seurat_list.rds")
+list_seurat <- readRDS("../../scRNAseq_data/GSE171524/rds/01_GSE171524_seurat_list.rds")
 doublets <- readRDS("Seurat/data/01_GSE171524_doublets.rds")
 
 ## merge seurat dataset
@@ -56,5 +56,5 @@ metadata$Cells <- rownames(metadata)
 merged_seurat@meta.data <- metadata
 
 ## Create .Rdata object to load seurat object
-saveRDS(merged_seurat, file = "~/scRNAseq/GSE171524/rds/02_GSE171524_merged_seurat.rds")
+saveRDS(merged_seurat, file = "../../scRNAseq_data/GSE171524/rds/02_GSE171524_merged_seurat.rds")
 

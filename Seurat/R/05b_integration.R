@@ -28,7 +28,7 @@ Sys.setenv(RETICULATE_PYTHON = "~/miniforge3/envs/scvi-env/bin/python")
 # 4. Load data
 
 ## load seurat object
-reduced_seurat <- readRDS("~/scRNAseq/GSE171524/rds/05a_GSE171524_seurat_reduced.rds")
+reduced_seurat <- readRDS("../../scRNAseq_data/GSE171524/rds/05a_GSE171524_seurat_reduced.rds")
 colors <- DiscretePalette_scCustomize(num_colors = 36, palette = "polychrome")
 
 #*****************************************
@@ -49,7 +49,7 @@ integrated_seurat <- IntegrateLayers(
 )
 
 ## reorder clusters from scvi clustering 
-integrated_seurat@meta.data$scvi_clusters <- factor(integrated_seurat@meta.data$scvi_clusters, levels = as.character(sort(as.numeric(levels(integrated_seurat@meta.data$scvi_clusters))))) ## reorder levels
+integrated_seurat$scvi_clusters <- factor(integrated_seurat$scvi_clusters, levels = as.character(sort(as.numeric(levels(integrated_seurat$scvi_clusters))))) ## reorder levels
 
 ## process integrated scvi data
 integrated_seurat <- FindNeighbors(integrated_seurat, reduction = "integrated.scvi", dims = 1:30)
@@ -62,21 +62,17 @@ integrated_seurat <- FindClusters(integrated_seurat, resolution = 1, cluster.nam
 integrated_seurat <- RunUMAP(integrated_seurat, reduction = "integrated.harmony", dims = 1:30, reduction.name = "umap.harmony")
 
 ## plot UMAPS for integrated data
-p1 <- DimPlot(integrated_seurat, reduction = "umap.unintegrated", group.by = c("Sample", "unintegrated_clusters", "Condition", "Phase"),
-              cols = colors, raster = FALSE, ncol = 1)
-p2 <- DimPlot(integrated_seurat,  reduction = "umap.scvi",  group.by = c("Sample", "scvi_clusters", "Condition", "Phase"),  combine = TRUE,
-              label.size = 2, ncol = 1, cols = colors, raster = FALSE) 
-p3 <- DimPlot(integrated_seurat,  reduction = "umap.harmony",  group.by = c("Sample", "harmony_clusters", "Condition", "Phase"),  combine = TRUE,
-              label.size = 2, ncol = 1, cols = colors, raster = FALSE)
-
+p1 <- DimPlot_scCustom(integrated_seurat, reduction = "umap.unintegrated", group.by = c("Sample", "unintegrated_clusters", "Condition", "Phase"), combine = TRUE,
+              raster = FALSE, num_columns = 1)
+p2 <- DimPlot_scCustom(integrated_seurat,  reduction = "umap.scvi",  group.by = c("Sample", "scvi_clusters", "Condition", "Phase"),  combine = TRUE,
+              num_columns = 1, raster = FALSE) 
+p3 <- DimPlot_scCustom(integrated_seurat,  reduction = "umap.harmony",  group.by = c("Sample", "harmony_clusters", "Condition", "Phase"),  combine = TRUE,
+              num_columns = 1, raster = FALSE)
 
 ## plot feature plots for integrated data
-p4 <- FeaturePlot(integrated_seurat, c("MitoRatio", "DoubletScore"), raster = FALSE, combine = TRUE, ncol = 1) & 
-  scale_color_viridis_c(option = "inferno", direction = 1)
-p5 <- FeaturePlot(integrated_seurat, c("MitoRatio", "DoubletScore"), reduction = "umap.scvi", raster = FALSE, combine = TRUE, ncol = 1) & 
-  scale_color_viridis_c(option = "inferno", direction = 1)
-p6 <- FeaturePlot(integrated_seurat, c("MitoRatio", "DoubletScore"), reduction = "umap.harmony", raster = FALSE, combine = TRUE, ncol = 1) & 
-  scale_color_viridis_c(option = "inferno", direction = 1)
+p4 <- FeaturePlot_scCustom(integrated_seurat, c("MitoRatio", "DoubletScore"), raster = FALSE, combine = TRUE, num_columns = 1) 
+p5 <- FeaturePlot_scCustom(integrated_seurat, c("MitoRatio", "DoubletScore"), reduction = "umap.scvi", raster = FALSE, combine = TRUE, num_columns  = 1)
+p6 <- FeaturePlot_scCustom(integrated_seurat, c("MitoRatio", "DoubletScore"), reduction = "umap.harmony", raster = FALSE, combine = TRUE, num_columns = 1) 
 
 ## combine plots
 group_umaps <- ggarrange(p1, p2, p3, ncol = 3, labels = LETTERS[1:3])
@@ -87,4 +83,4 @@ ggsave("Seurat/results/UMAP_groups_integration.png", group_umaps, width = 500, h
 ggsave("Seurat/results/UMAP_gradient_integration.png", gradient_umaps, width = 500, height = 400, unit = "mm")
 
 ## save data
-saveRDS(integrated_seurat, file = "~/scRNAseq/GSE171524/rds/05b_GSE171524_seurat_integrated.rds")
+saveRDS(integrated_seurat, file = "../../scRNAseq_data/GSE171524/rds/05b_GSE171524_seurat_integrated.rds")

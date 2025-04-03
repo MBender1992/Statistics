@@ -62,7 +62,7 @@ custom_RidgePlot <- function(seurat.obj, metric, upper.xlim = NULL){
 # 4. Load data
 
 ## load seurat object
-merged_seurat <- readRDS("~/scRNAseq/GSE171524/rds/02_GSE171524_merged_seurat.rds")
+merged_seurat <- readRDS("../../scRNAseq_data/GSE171524/rds/02_GSE171524_merged_seurat.rds")
 metadata <- merged_seurat@meta.data
 
 #*****************************************
@@ -209,4 +209,4 @@ ggsave("Seurat/results/combined_qc_scatter_filtered.png", p8, width = 300, heigh
 ggsave("Seurat/results/QC_ViolinPlot_filtered.png", p9, width = 300, height =250, unit = "mm")
 
 ## Create .rds object to load at any time
-saveRDS(filtered_seurat, file = "~/scRNAseq/GSE171524/rds/03_GSE171524_seurat_filtered.rds")
+saveRDS(filtered_seurat, file = "../../scRNAseq_data/GSE171524/rds/03_GSE171524_seurat_filtered.rds")
